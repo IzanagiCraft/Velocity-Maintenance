@@ -1,0 +1,89 @@
+name: Gradle Build and GitHub Release
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: Build and Release on GitHub
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Setup Java
+        uses: actions/setup-java@v2
+        with:
+          java-version: 17
+          distribution: 'temurin'
+
+      - name: Build and Test
+        run: ./gradlew licenseFormat build
+
+      - name: Get Old Release Tag
+        id: get_old_release
+        run: |
+          OLD_TAG=$(curl -s -H "Authorization: token ${{ secrets.DEPLOY_KEY }}" \
+            "https://api.github.com/repos/${{ github.repository }}/releases" | \
+            jq -r '.[0].tag_name')
+          if [ -z "$OLD_TAG" ] || [ "$OLD_TAG" = "null" ]; then
+            OLD_TAG="v1.0-SNAPSHOT"
+          fi
+          echo "Old release tag: $OLD_TAG"
+          echo "::set-output name=old_tag::$OLD_TAG"
+        env:
+          RELEASE_TOKEN: ${{ secrets.DEPLOY_KEY }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+
+      - name: Get Old Release ID
+        id: get_old_release_id
+        run: |
+          OLD_ID=$(curl -s -H "Authorization: token ${{ secrets.DEPLOY_KEY }}" \
+            "https://api.github.com/repos/${{ github.repository }}/releases" | \
+            jq -r '.[0].id')
+          echo "Old release tag: $OLD_ID"
+          echo "::set-output name=old_id::$OLD_ID"
+        env:
+          RELEASE_TOKEN: ${{ secrets.DEPLOY_KEY }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+
+      - name: Delete Old Release
+        if: steps.get_old_release.outputs.old_tag != ''
+        run: |
+          curl -X DELETE \
+            -H "Authorization: token ${{ secrets.DEPLOY_KEY }}" \
+            "https://api.github.com/repos/${{ github.repository }}/releases/${{ steps.get_old_release_id.outputs.old_id }}"
+        env:
+          RELEASE_TOKEN: ${{ secrets.DEPLOY_KEY }}
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.DEPLOY_KEY }}
+        with:
+          tag_name: ${{ steps.get_old_release.outputs.old_tag }}
+          release_name: Release ${{ steps.get_old_release.outputs.old_tag }}
+          draft: false
+          prerelease: false
+
+      - name: Upload Artifacts
+        id: upload-artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: build-artifacts
+          path: out/*.jar
+
+      - name: Upload JARs as Release Assets
+        id: upload-jars
+        run: |
+          for jar in out/*.jar; do
+            curl -X POST \
+              -H "Authorization: token ${{ secrets.DEPLOY_KEY }}" \
+              -H "Content-Type: application/java-archive" \
+              --data-binary @$jar \
+              "https://uploads.github.com/repos/${{ github.repository }}/releases/${{ steps.create_release.outputs.id }}/assets?name=$(basename $jar)"
+          done

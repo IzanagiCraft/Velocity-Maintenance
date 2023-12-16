@@ -1,0 +1,45 @@
+[plugin]
+
+# the plugin prefix used for placeholders and chat messages
+prefix = "&l&#CB2D3EM&#CF303Ea&#D2323Di&#D6353Dn&#D9373Ct&#DD3A3Ce&#E13D3Cn&#E43F3Ba&#E8423Bn&#EB443Ac&#EF473Ae&r"
+
+[permissions]
+
+# the join while maintenance permission which is checked when a player joins
+# if this is unset or empty no player is allowed to join
+join = "maintenance.join"
+
+# permissions to enable and disable maintenance mode
+enable = "maintenance.enable"
+disable = "maintenance.disable"
+
+[messages]
+
+message-seperator = "&8»&r"
+message-color = "&7"
+
+maintenance-enabled = "Maintenance mode &aenabled&7."
+maintenance-disabled = "Maintenance mode &cdisabled&7."
+maintenance-error = "Cannot change maintenance mode."
+maintenance-usage = "Usage: &e/maintenance &aon&e/&coff"
+
+# the kick message the player which gets sent on kick
+# %prefix% sets the plugin prefix
+kick = """
+&r&8&m+-----------+&r %prefix% &r&8&m+-----------+&r
+&cServer in maintenance mode.
+&eYou can try to join later.
+&7Join our Discord: &9discord.izanagicraft.com
+&r&8&m+-----------+&r %prefix% &r&8&m+-----------+&r
+"""
+
+[ping]
+
+# the shown server motd on ping
+# %prefix% sets the plugin prefix
+# unset or empty does not change the motd
+motd = ""
+
+# the shown server version on ping
+# unset or empty does not change the version
+version = "§4Maintenance"

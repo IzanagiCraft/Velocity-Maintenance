@@ -1,0 +1,12 @@
+[versions]
+
+# Gradle plugins
+shadow = "7.1.2"
+licenser = "0.6.1"
+
+[plugins]
+# Gradle plugins
+shadow = { id = "com.github.johnrengelman.shadow", version.ref = "shadow" }
+licenser = { id = "org.cadixdev.licenser", version.ref = "licenser" }
+
+[libraries]
