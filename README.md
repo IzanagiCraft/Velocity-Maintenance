@@ -3,7 +3,7 @@
 </div>
 <div align="center">
     <h1>IzanagiCraft - Velocity-Maintenance Plugin</h1>
-    <a href="https://discord.gg/ySsgfQmY">
+    <a href="https://discord.izanagicraft.com/">
         <img src="https://img.shields.io/discord/1183768311851388958.svg?colorB=Blue&logo=discord&label=Support+%26+Community&style=for-the-badge" alt="Support">
     </a>
     <a href="https://github.com/IzanagiCraft/Velocity-Maintenance/issues">
